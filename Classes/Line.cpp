@@ -36,7 +36,7 @@ void Line::initWithLastLine(Line *lastLine) {
     RectMap* newRect;
     for(int t = 0 ; t<RECT_NUM_WIDTH; ++t){
 
-        int type = MAX(1,MIN(2,randomProducer->getRandom(BRICK-2,STONE)));
+        int type = MAX(1,MIN(2,randomProducer->getRandom(BRICK-2,DIAMOND)));
 
         type = MAX(1,type);
 
@@ -44,6 +44,7 @@ void Line::initWithLastLine(Line *lastLine) {
         switch (type){
             case BRICK: newRect =  Brick::create();break;
             case STONE: newRect = Stone::create();break;
+            case DIAMOND: newRect = Ore::create();((Ore*)newRect)->setOreType(DIAMOND);break;
             default: log("rect type error!");
         };
 
@@ -55,7 +56,7 @@ void Line::initWithLastLine(Line *lastLine) {
     while(t < RECT_NUM_WIDTH) {
         log("loop1");
         int start = RECT_NUM_WIDTH - 1, end = 0;
-        while (t< RECT_NUM_WIDTH&&lastLine->getRectByID(t)->getType() == BRICK) {
+        while (t< RECT_NUM_WIDTH&&lastLine->getRectByID(t)->getType() != STONE ) {
             start = MIN(t, start);
             end = MAX(t, end);
             t++;

@@ -14,7 +14,10 @@ bool RectMap::init() {
 }
 
 void RectMap::beDigged(){
-    if(!empty)hp--;
+    if(!empty){
+        hp--;
+        NotificationCenter::getInstance()->postNotification("changeEnergy",this);
+    }
 }
 
 void RectMap::clear(){
@@ -45,8 +48,8 @@ void Brick::beDigged() {
         _sprite->setVisible(false);
         auto explo = ParticleExplosion::create();
         explo->setTexture(Director::getInstance()->getTextureCache()->addImage("Brick.jpg"));
-        explo->setLife(0.15);
-        explo->setLifeVar(0.15);
+        explo->setLife(ACTION_INTERVAL);
+        explo->setLifeVar(ACTION_INTERVAL);
         explo->setTotalParticles(60);
         explo->setStartSize(VISIZE.width/RECT_NUM_WIDTH/5);
         explo->setStartSizeVar(VISIZE.width/RECT_NUM_WIDTH/2/5/2);
@@ -75,9 +78,34 @@ bool Stone::init() {
 
 void Stone::beDigged() {
     RectMap::beDigged();
-
-    NotificationCenter::getInstance()->postNotification("Crash!");
 }
 
+bool Ore::init() {
+    if(!Brick::init()){
+        return false;
+    }
+    return true;
+}
 
+void Ore::clear() {
+    RectMap::clear();
+    _extra->setOpacity(0);
+    type = BRICK;
+}
 
+void Ore::beDigged() {
+    Brick::beDigged();
+    this->removeChild(_extra);
+    log("OreDig");
+}
+
+void Ore::setOreType(int type) {
+    this->type = type;
+    switch (type){
+        case DIAMOND:
+            _extra = Sprite::create("ex-rock.png");
+            _extra->setScale(VISIZE.width/RECT_NUM_WIDTH/_extra->getContentSize().width);
+            _extra->setPosition(_sprite->getPosition());
+            this->addChild(_extra);
+        }
+}

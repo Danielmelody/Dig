@@ -8,7 +8,7 @@ bool Grap::init() {
     if (!Node::init()) {
         return false;
     }
-    _sprite = Sprite::create("BlueShit.jpeg");
+    _sprite = Sprite::create("machine_basic.png");
     this->addChild(_sprite);
     _sprite->setScale(VISIZE.width/RECT_NUM_WIDTH/_sprite->getContentSize().width);
     log("grap init done");

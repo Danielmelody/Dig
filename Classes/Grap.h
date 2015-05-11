@@ -15,6 +15,7 @@ public:
     virtual bool init();
     //move and dig
     void Dig(int Direction);
+    inline Sprite* getSprite(){ return _sprite;}
     CREATE_FUNC(Grap);
 private:
     Point lastTargetPos;

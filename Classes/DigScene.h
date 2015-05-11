@@ -7,6 +7,7 @@
 #include "Grap.h"
 #include "DataDefines.h"
 #include "Shake.h"
+#include "StopScene.h"
 
 using namespace std;
 USING_NS_CC;
@@ -29,17 +30,35 @@ public:
 
     void Shake(Ref* pSender);
 
+    void addEnergy(Ref* pSender);
 
     bool Crash(list<Line*>::iterator nextLine,int nextverID);
+
+    void updateHp(float dt);
+
+    void pause();
+
+    void fail();
+
+    void Myresume();
 
     // implement the "static create()" method manually
     CREATE_FUNC(DigScene);
 private:
+    bool isPause;
     Grap* grap;
     list<Line*> vertical;
     list<Line*>::iterator currentLine;
     int verticalID;
     EventListenerTouchOneByOne* listener;
+    Grap* virtualGrap;
+    float hp;
+    int score;
+    Label* scoreLabel;
+    ProgressTimer* progressTimer;
+    Sprite* timer;
+    Layer* stop;
+    Sprite* blackBG;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

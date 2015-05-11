@@ -40,5 +40,16 @@ public:
     CREATE_FUNC(Stone);
 };
 
+class Ore:public Brick{
+public:
+    bool init()override;
+    void beDigged()override;
+    void clear()override;
+    inline Sprite* getExtra(){ return _extra;}
+    void setOreType(int type);
+    CREATE_FUNC(Ore);
+private:
+    Sprite* _extra;
+};
 
 #endif //MYGAME_RECTMAP_H
