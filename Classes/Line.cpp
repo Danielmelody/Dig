@@ -25,9 +25,9 @@ void Line::up() {
     /*
      * To avoid logic error when player operate too frequently,you must use lastTargetPos
      */
-    this->setPosition(lastTargetPos);
+    //this->setPosition(lastTargetPos);
     this->runAction(MoveBy::create(ACTION_INTERVAL,Point(0,VISIZE.width/RECT_NUM_WIDTH)));
-    lastTargetPos += Point(0,VISIZE.width/RECT_NUM_WIDTH);
+    //lastTargetPos += Point(0,VISIZE.width/RECT_NUM_WIDTH);
 }
 
 void Line::initWithLastLine(Line *lastLine) {
@@ -36,7 +36,7 @@ void Line::initWithLastLine(Line *lastLine) {
     RectMap* newRect;
     for(int t = 0 ; t<RECT_NUM_WIDTH; ++t){
 
-        int type = MAX(1,MIN(2,randomProducer->getRandom(BRICK-2,DIAMOND)));
+        int type = MAX(1,MIN(2,randomProducer->getRandom(BRICK-2,FIRE)));
 
         type = MAX(1,type);
 
@@ -45,6 +45,7 @@ void Line::initWithLastLine(Line *lastLine) {
             case BRICK: newRect =  Brick::create();break;
             case STONE: newRect = Stone::create();break;
             case DIAMOND: newRect = Ore::create();((Ore*)newRect)->setOreType(DIAMOND);break;
+            case FIRE: newRect = Ore::create();((Ore*)newRect)->setOreType(FIRE);break;
             default: log("rect type error!");
         };
 

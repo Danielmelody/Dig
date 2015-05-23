@@ -25,6 +25,7 @@ void DigScene::setTouchLayer(Layer *layer) {
         virtualGrap->getSprite()->setVisible(true);
         virtualGrap->getSprite()->setOpacity(0);
         virtualGrap->getSprite()->setScale(grap->getSprite()->getScale());
+        virtualGrap->setPosition(grap->getPosition());
       return true;
     };
 
@@ -34,15 +35,18 @@ void DigScene::setTouchLayer(Layer *layer) {
 
         if(move.getDistance(Point(0,0))>VISIZE.width/50) {
 
+            virtualGrap->getSprite()->setScale(VISIZE.width/RECT_NUM_WIDTH/virtualGrap->getSprite()->getContentSize().width);
 
-            grap->getSprite()->setRotation(-180 * (move.getAngle() + acos(-1) / 2) / acos(-1));
 
-            virtualGrap->setPosition(grap->getPosition());
-            virtualGrap->getSprite()->setOpacity(100);
+            //grap->getSprite()->setRotation(-180 * (move.getAngle() + acos(-1) / 2) / acos(-1));
+
+
+             virtualGrap->getSprite()->setOpacity(100);
 
 
             if (abs(move.x) > abs(move.y)) {
                 virtualGrap->getSprite()->setRotation(move.x>0 ? -90 : 90);
+                grap->getSprite()->setRotation(move.x>0 ? -90 : 90);
                 if (move.x > 0) {
                     virtualGrap->getSprite()->setPosition(
                             grap->getSprite()->getPosition() + Point(VISIZE.width / RECT_NUM_WIDTH, 0));
@@ -58,6 +62,7 @@ void DigScene::setTouchLayer(Layer *layer) {
                     virtualGrap->getSprite()->setPosition(
                             grap->getSprite()->getPosition() + Point(0, -VISIZE.width / RECT_NUM_WIDTH));
                     virtualGrap->getSprite()->setRotation(0);
+                    grap->getSprite()->setRotation(0);
                 }
 
             }
@@ -77,7 +82,6 @@ void DigScene::setTouchLayer(Layer *layer) {
 
                 if (move.y < 0)turnDown();
             }
-            virtualGrap->getSprite()->setScale(VISIZE.width/RECT_NUM_WIDTH/virtualGrap->getSprite()->getContentSize().width);
             virtualGrap->getSprite()->runAction(
                     Spawn::create(ScaleBy::create(ACTION_INTERVAL * 2, 2), FadeTo::create(ACTION_INTERVAL * 2, 0),
                                   nullptr));
@@ -119,6 +123,7 @@ void DigScene::turnDown() {
     }
 
     score++;
+    hpSpeed += HP_UPDATE_ADD;
     char str[100] = {'0'};
     sprintf(str, "%d", score);
     scoreLabel->setString(str);
@@ -151,7 +156,7 @@ void DigScene::Shake(Ref *pSender) {
 
 
 void DigScene::updateHp(float dt) {
-    hp -= HP_UNIT_UPDATE;
+    hp -= hpSpeed;
     float nowhp = progressTimer->getPercentage();
     progressTimer->setPercentage(nowhp-HP_UNIT_UPDATE);
     if(nowhp>75){
@@ -180,7 +185,10 @@ bool DigScene::init()
         return false;
     }
 
+    extraDig = [&](int direction){};
+
     hp = 100;
+    hpSpeed = HP_UNIT_UPDATE;
     this->schedule(schedule_selector(DigScene::updateHp),1/60);
     timer = Sprite::create("energy_front.png");
 
@@ -304,13 +312,16 @@ bool DigScene::init()
     /*Shake call-func when run into Stone*/
     NotificationCenter::getInstance()->addObserver(this,callfuncO_selector(DigScene::Shake),"shake", nullptr);
     NotificationCenter::getInstance()->addObserver(this,callfuncO_selector(DigScene::addEnergy),"changeEnergy",nullptr);
-    
+    NotificationCenter::getInstance()->addObserver(this,callfuncO_selector())
     return true;
 }
 
+
+
+
 void DigScene::fail() {
 
-    NotificationCenter::getInstance()->removeAllObservers(this);
+    pause();
 
     log("fail");
 }
@@ -340,18 +351,23 @@ void DigScene::pause() {
     auto restart = MenuItemImage::create("menu_restart.png", "menu_restart.png", [=](Ref* sender)
     {
         log("restart");
+
+        SimpleAudioEngine::getInstance()->playEffect(RESTART_AUDIO);
+
         auto re = [=](){
-            pause();
 
             listener->setEnabled(false);
 
+            NotificationCenter::getInstance()->removeAllObservers(this);
+
             Director::getInstance()->replaceScene(DigScene::createScene());
+
         };
         stop->runAction(Sequence::create(MoveBy::create(0.3,Point(-VISIZE.width,0)),CallFunc::create(re), nullptr));
     }
     );
 
-    restart->setPosition(Point(-VISIZE.width/1.414/2*0.6 + VISIZE.width/2,VISIZE.height/2 - timeOut->getBoundingBox().size.height/2+restart->getNormalImage()->getBoundingBox().size.height*0.7));
+    restart->setPosition(Point(-VISIZE.width/1.414/2*0.6 + VISIZE.width/2,VISIZE.height/2 - timeOut->getBoundingBox().size.height/2+restart->getNormalImage()->getBoundingBox().size.height));
     restart->setScale(VISIZE.width/6/restart->getSelectedImage()->getContentSize().width);
 
 
@@ -367,7 +383,7 @@ void DigScene::pause() {
     );
 
     home->setScale(VISIZE.width/6/home->getSelectedImage()->getContentSize().width);
-    home->setPosition(VISIZE.width/2,VISIZE.height/2 - timeOut->getBoundingBox().size.height/2+home->getNormalImage()->getBoundingBox().size.height*0.7);
+    home->setPosition(VISIZE.width/2,VISIZE.height/2 - timeOut->getBoundingBox().size.height/2+home->getNormalImage()->getBoundingBox().size.height);
 
 
     auto sound = MenuItemImage::create("menu_voice.png", "menu_voice.png", [=](Ref* sender)
@@ -376,7 +392,7 @@ void DigScene::pause() {
     }
     );
 
-    sound->setPosition(Point(VISIZE.width*(1/1.414/2*0.6+0.5),VISIZE.height/2 - timeOut->getBoundingBox().size.height/2+sound->getNormalImage()->getBoundingBox().size.height*0.7));
+    sound->setPosition(Point(VISIZE.width*(1/1.414/2*0.6+0.5),VISIZE.height/2 - timeOut->getBoundingBox().size.height/2+sound->getNormalImage()->getBoundingBox().size.height));
     sound->setScale(VISIZE.width/6/sound->getSelectedImage()->getContentSize().width);
 
     auto menu = Menu::create(restart,home,sound, nullptr);
@@ -404,5 +420,6 @@ void DigScene::addEnergy(Ref *pSender) {
         case BRICK:progressTimer->setPercentage(progressTimer->getPercentage()+BRICK_ENERGY);break;
         case STONE:progressTimer->setPercentage(progressTimer->getPercentage()+STONE_ENERGY);break;
         case DIAMOND:progressTimer->setPercentage(progressTimer->getPercentage()+DIAMOND_ENERGY);break;
+        case FIRE:progressTimer->setPercentage(progressTimer->getPercentage()+FIRE_ENERGY);break;
     }
 }

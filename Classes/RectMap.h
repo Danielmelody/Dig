@@ -5,6 +5,8 @@
 
 #include <cocos2d.h>
 #include "DataDefines.h"
+#include "Audio.h"
+
 USING_NS_CC;
 
 

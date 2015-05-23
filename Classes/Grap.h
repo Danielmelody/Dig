@@ -7,6 +7,8 @@
 #include "cocos2d.h"
 USING_NS_CC;
 
+#include "Audio.h"
+
 #include "DataDefines.h"
 
 

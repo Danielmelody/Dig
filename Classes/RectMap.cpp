@@ -96,6 +96,17 @@ void Ore::clear() {
 void Ore::beDigged() {
     Brick::beDigged();
     this->removeChild(_extra);
+
+    switch (type){
+        case DIAMOND:
+            SimpleAudioEngine::getInstance()->playEffect(MINE1_AUDIO);
+            break;
+        case FIRE:
+            SimpleAudioEngine::getInstance()->playEffect(MINE1_AUDIO);
+            NotificationCenter::getInstance()->postNotification("equip",this);
+            break;
+    }
+
     log("OreDig");
 }
 
@@ -104,8 +115,13 @@ void Ore::setOreType(int type) {
     switch (type){
         case DIAMOND:
             _extra = Sprite::create("ex-rock.png");
-            _extra->setScale(VISIZE.width/RECT_NUM_WIDTH/_extra->getContentSize().width);
-            _extra->setPosition(_sprite->getPosition());
-            this->addChild(_extra);
+            break;
+        case FIRE:
+            _extra = Sprite::create("f-rock.png");
+            break;
         }
+    _extra->setScale(VISIZE.width/RECT_NUM_WIDTH/_extra->getContentSize().width);
+    _extra->setPosition(_sprite->getPosition());
+    this->addChild(_extra);
 }
+

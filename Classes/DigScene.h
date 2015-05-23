@@ -8,6 +8,7 @@
 #include "DataDefines.h"
 #include "Shake.h"
 #include "StopScene.h"
+#include "Audio.h"
 
 using namespace std;
 USING_NS_CC;
@@ -42,6 +43,9 @@ public:
 
     void Myresume();
 
+
+    std::function<void(int direction)> extraDig;
+
     // implement the "static create()" method manually
     CREATE_FUNC(DigScene);
 private:
@@ -52,7 +56,7 @@ private:
     int verticalID;
     EventListenerTouchOneByOne* listener;
     Grap* virtualGrap;
-    float hp;
+    float hp,hpSpeed;
     int score;
     Label* scoreLabel;
     ProgressTimer* progressTimer;
