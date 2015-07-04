@@ -8,6 +8,7 @@
 
 #include "cocos2d.h"
 #include "DataDefines.h"
+#include "DigScene.h"
 USING_NS_CC;
 
 
@@ -16,6 +17,11 @@ class HomeScene: public Scene {
 public:
     bool init()override;
     CREATE_FUNC(HomeScene);
+    void replaceScene(Ref* pRect);
+
+
+private:
+    bool isOut;
 };
 
 

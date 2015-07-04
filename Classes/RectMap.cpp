@@ -69,7 +69,7 @@ bool Stone::init() {
     }
     type = STONE;
     hp = 3;
-    _sprite = Sprite::create("Stone.jpg");
+    _sprite = Sprite::create("Stone.png");
     _sprite->setScale(VISIZE.width/RECT_NUM_WIDTH/_sprite->getContentSize().width);
     this->addChild(_sprite);
 
@@ -77,6 +77,7 @@ bool Stone::init() {
 }
 
 void Stone::beDigged() {
+    SimpleAudioEngine::getInstance()->playEffect(CRASH_AUDIO);
     RectMap::beDigged();
 }
 

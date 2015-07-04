@@ -24,5 +24,8 @@ using namespace CocosDenshion;
 #define RESTART_AUDIO "audio/Restart"PLATFROM_ADDS
 #define DIG_AUDIO "audio/dig"PLATFROM_ADDS
 #define MINE1_AUDIO "audio/Mine1"PLATFROM_ADDS
-
+#define BUTTON "audio/Button"PLATFROM_ADDS
+#define FAIL_AUDIO "audio/fail"PLATFROM_ADDS
+#define CRASH_AUDIO "audio/crash"PLATFROM_ADDS
+#define BG_MUSIC "audio/BGM.mp3"
 #endif //MYGAME_AUDIO_H

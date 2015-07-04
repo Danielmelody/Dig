@@ -73,6 +73,12 @@ void DigScene::setTouchLayer(Layer *layer) {
         Point move = touch->getLocation()-touch->getStartLocation();
         if(move.getDistance(Point(0,0))>VISIZE.width/50) {
             log("end");
+
+            if(isFirstTouch){
+                SimpleAudioEngine::getInstance()->playBackgroundMusic(BG_MUSIC,true);
+                isFirstTouch = false;
+            }
+
             if (abs(move.x) > abs(move.y)) {
                 grap->getSprite()->runAction(RotateTo::create(ACTION_INTERVAL, move.x > 0 ? -90 : 90));
                 turnHorizen(move.x > 0 ? RIGHT : LEFT);
@@ -175,9 +181,15 @@ void DigScene::updateHp(float dt) {
     if(nowhp==0)fail();
 }
 
+void DigScene::onEnter(){
+    Layer::onEnter();
+    //SimpleAudioEngine::getInstance()->playBackgroundMusic(BG_MUSIC,true);
+    isFirstTouch = true;
+}
+
 // on "init" you need to initialize your instance
-bool DigScene::init()
-{
+bool DigScene::init(){
+
     //////////////////////////////
     // 1. super init first
     if ( !Layer::init() )
@@ -277,8 +289,9 @@ bool DigScene::init()
     isPause = false;
 
 
-    MenuItemSprite* pauseMenu = MenuItemSprite::create(pauseSprite, nullptr, [=](Ref* sender)
+    MenuItemSprite* pauseMenuItem = MenuItemSprite::create(pauseSprite, nullptr, [=](Ref* sender)
     {
+        SimpleAudioEngine::getInstance()->playEffect(BUTTON);
         if(!isPause) {
             pauseSprite->setTexture(Director::getInstance()->getTextureCache()->addImage("settings-play.png"));
             pause();
@@ -292,19 +305,17 @@ bool DigScene::init()
     }
     );
 
-    Menu* menu = Menu::create(pauseMenu, nullptr);
+    pauseMenu = Menu::create(pauseMenuItem, nullptr);
 
-    menu->ignoreAnchorPointForPosition(true);
 
     ///pauseMenu->setPosition(VISIZE.width*0.8,VISIZE.height*0.9);
 
-    menu->setPosition(VISIZE.width - pauseSprite->getBoundingBox().size.width,VISIZE.height-pauseSprite->getBoundingBox().size.height);
+    pauseMenu->setPosition(VISIZE.width - pauseSprite->getBoundingBox().size.width,VISIZE.height-pauseSprite->getBoundingBox().size.height);
 
 
+    this->addChild(pauseMenu,11);
 
-    this->addChild(menu,11);
-
-    log("x:%f,y:%f",menu->getPosition().x,menu->getPosition().y);
+    log("x:%f,y:%f",pauseMenu->getPosition().x,pauseMenu->getPosition().y);
 
     /*set touch enabled*/
     setTouchLayer(this);
@@ -312,7 +323,9 @@ bool DigScene::init()
     /*Shake call-func when run into Stone*/
     NotificationCenter::getInstance()->addObserver(this,callfuncO_selector(DigScene::Shake),"shake", nullptr);
     NotificationCenter::getInstance()->addObserver(this,callfuncO_selector(DigScene::addEnergy),"changeEnergy",nullptr);
-    NotificationCenter::getInstance()->addObserver(this,callfuncO_selector())
+    //NotificationCenter::getInstance()->addObserver(this,callfuncO_selector())
+
+
     return true;
 }
 
@@ -321,17 +334,22 @@ bool DigScene::init()
 
 void DigScene::fail() {
 
+    SimpleAudioEngine::getInstance()->playEffect(FAIL_AUDIO);
+
     pause();
+    SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+    pauseMenu->setVisible(false);
+    pauseMenu->setEnabled(false);
 
     log("fail");
 }
 
-void DigScene::pause() {
+void DigScene::pause(){
     stop = Layer::create();
 
     stop->setPosition(Point(VISIZE.width,0));
 
-    stop->runAction(MoveTo::create(0.3,Point(0,0)));
+    stop->runAction(EaseBackOut::create(MoveTo::create(PAUSE_TIME,Point(0,0))));
 
     this->addChild(stop,11);
 
@@ -363,7 +381,7 @@ void DigScene::pause() {
             Director::getInstance()->replaceScene(DigScene::createScene());
 
         };
-        stop->runAction(Sequence::create(MoveBy::create(0.3,Point(-VISIZE.width,0)),CallFunc::create(re), nullptr));
+        stop->runAction(Sequence::create(EaseBackIn::create(MoveBy::create(PAUSE_TIME,Point(-VISIZE.width,0))),CallFunc::create(re), nullptr));
     }
     );
 
@@ -376,9 +394,9 @@ void DigScene::pause() {
     {
         log("home");
         auto re = [=](){
-            Director::getInstance()->replaceScene(DigScene::createScene());
+            Director::getInstance()->replaceScene(TransitionSlideInT::create(0.3,HomeScene::create()));
         };
-        stop->runAction(Sequence::create(MoveBy::create(0.3,Point(0,-VISIZE.height)),CallFunc::create(re), nullptr));
+        stop->runAction(Spawn::create(MoveBy::create(0.3,Point(0,-VISIZE.height)),CallFunc::create(re), nullptr));
     }
     );
 
@@ -400,6 +418,9 @@ void DigScene::pause() {
     stop->addChild(menu,12);
     stop->setTouchEnabled(true);
     menu->setEnabled(true);
+    listener->setEnabled(false);
+
+    SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
 
 }
 
@@ -412,6 +433,7 @@ void DigScene::Myresume() {
     stop->runAction(Sequence::create(MoveBy::create(0.3,Point(VISIZE.width,0)),CallFunc::create(re), nullptr));
     this->removeChild(blackBG);
     this->schedule(schedule_selector(DigScene::updateHp),1/60);
+    SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
 }
 
 void DigScene::addEnergy(Ref *pSender) {

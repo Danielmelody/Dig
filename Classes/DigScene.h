@@ -9,6 +9,7 @@
 #include "Shake.h"
 #include "StopScene.h"
 #include "Audio.h"
+#include "HomeScene.h"
 
 using namespace std;
 USING_NS_CC;
@@ -22,6 +23,8 @@ public:
 
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();
+
+    void onEnter();
 
     void setTouchLayer(Layer* layer);
 
@@ -50,6 +53,7 @@ public:
     CREATE_FUNC(DigScene);
 private:
     bool isPause;
+    bool isFirstTouch;
     Grap* grap;
     list<Line*> vertical;
     list<Line*>::iterator currentLine;
@@ -63,6 +67,7 @@ private:
     Sprite* timer;
     Layer* stop;
     Sprite* blackBG;
+    Menu* pauseMenu;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

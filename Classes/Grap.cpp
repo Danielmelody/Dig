@@ -27,4 +27,5 @@ void Grap::Dig(int Direction) {
     SimpleAudioEngine::getInstance()->playEffect(DIG_AUDIO);
     //lastTargetPos += Point(Direction*VISIZE.width/RECT_NUM_WIDTH,0);
     log("horizen");
+    log("xxx");
 }

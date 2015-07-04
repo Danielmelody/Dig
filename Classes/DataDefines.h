@@ -5,6 +5,7 @@
 
 USING_NS_CC;
 #define ACTION_INTERVAL 0.1
+#define PAUSE_TIME 0.5
 #define RECT_NUM_WIDTH 6
 #define VISIZE (Director::getInstance()->getVisibleSize())
 #define LEFT -1
