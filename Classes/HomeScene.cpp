@@ -5,10 +5,23 @@
 #include "HomeScene.h"
 #include "Audio.h"
 
-bool HomeScene::init() {
-    if (!Scene::init()) {
+void HomeScene::onEnter(){
+    Node::onEnter();
+    SimpleAudioEngine::getInstance()->playBackgroundMusic(S_BG_MUSIC, true);
+}
+
+
+bool HomeScene::init(){
+    if (!Scene::init()){
         return false;
     }
+
+    SimpleAudioEngine::getInstance()->preloadEffect(RESTART_AUDIO);
+    SimpleAudioEngine::getInstance()->preloadEffect(DIG_AUDIO);
+    SimpleAudioEngine::getInstance()->preloadEffect(MINE1_AUDIO);
+    SimpleAudioEngine::getInstance()->preloadEffect(BUTTON);
+    SimpleAudioEngine::getInstance()->preloadEffect(FAIL_AUDIO);
+    SimpleAudioEngine::getInstance()->preloadEffect(CRASH_AUDIO);
 
 
     Sprite *BG = Sprite::create("background.png");
@@ -26,9 +39,6 @@ bool HomeScene::init() {
     this->addChild(dig_logo);
 
 
-
-
-
     auto playMenu = Sprite::create("pl.png");
     playMenu->runAction(MoveBy::create(0.5,Point(0,-playMenu->getBoundingBox().size.height/2)));
     playMenu->setPosition(dig_logo->getContentSize().width/2,dig_logo->getContentSize().height/2);
@@ -38,15 +48,18 @@ bool HomeScene::init() {
     auto listenner = EventListenerTouchOneByOne::create();
 
     listenner->onTouchBegan = [=](Touch* touch,Event* event){
-        if(playMenu->getBoundingBox().containsPoint(playMenu->convertToWorldSpace(touch->getLocation()))){
+
+        if(playMenu->getBoundingBox().containsPoint(playMenu->getParent()->convertToNodeSpace(touch->getLocation()))){
+            playMenu->setOpacity(0);
             isOut = false;
+            log("ok");
             return true;
         }
         return false;
     };
 
     listenner->onTouchMoved = [=](Touch* touch,Event* event){
-        if(playMenu->getBoundingBox().containsPoint(playMenu->convertToWorldSpace(touch->getLocation()))){
+        if(playMenu->getBoundingBox().containsPoint(playMenu->convertToNodeSpace(touch->getLocation()))){
             isOut = true;
         }
         else{
@@ -57,33 +70,29 @@ bool HomeScene::init() {
     listenner->onTouchEnded = [=](Touch* touch,Event* event){
         if(!isOut){
 
+            playMenu->setOpacity(255);
+
+
             playMenu->runAction(Sequence::create(Spawn::create(MoveBy::create(0.5,Point(0,playMenu->getBoundingBox().size.height/2)),FadeTo::create(0.5,0),nullptr),
             CallFunc::create([=](){
 
                 Director::getInstance()->replaceScene(TransitionSlideInB::create(0.5,DigScene::createScene()));
 
             }), nullptr));
+
         }
     };
 
 
-    playMenu->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listenner,playMenu);
+    playMenu->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listenner,dig_logo);
 
-
-
-    SimpleAudioEngine::getInstance()->preloadEffect(RESTART_AUDIO);
-    SimpleAudioEngine::getInstance()->preloadEffect(DIG_AUDIO);
-    SimpleAudioEngine::getInstance()->preloadEffect(MINE1_AUDIO);
-    SimpleAudioEngine::getInstance()->preloadEffect(BUTTON);
-    SimpleAudioEngine::getInstance()->preloadEffect(FAIL_AUDIO);
-    SimpleAudioEngine::getInstance()->preloadEffect(CRASH_AUDIO);
-
-    SimpleAudioEngine::getInstance()->preloadBackgroundMusic(BG_MUSIC);
 
 
     return true;
 }
 
 void HomeScene::replaceScene(Ref *pRect) {
+    this->runAction(RuduceVolume::create(0.5));
     Director::getInstance()->replaceScene(TransitionRotoZoom::create(0.5,DigScene::createScene()));
 }
+

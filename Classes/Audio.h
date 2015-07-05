@@ -28,4 +28,5 @@ using namespace CocosDenshion;
 #define FAIL_AUDIO "audio/fail"PLATFROM_ADDS
 #define CRASH_AUDIO "audio/crash"PLATFROM_ADDS
 #define BG_MUSIC "audio/BGM.mp3"
+#define S_BG_MUSIC "audio/StartBGM.mp3"
 #endif //MYGAME_AUDIO_H

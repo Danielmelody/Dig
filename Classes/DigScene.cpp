@@ -183,7 +183,8 @@ void DigScene::updateHp(float dt) {
 
 void DigScene::onEnter(){
     Layer::onEnter();
-    //SimpleAudioEngine::getInstance()->playBackgroundMusic(BG_MUSIC,true);
+    SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+    SimpleAudioEngine::getInstance()->preloadBackgroundMusic(BG_MUSIC);
     isFirstTouch = true;
 }
 
@@ -242,6 +243,7 @@ bool DigScene::init(){
 
     this->addChild(scoreLabel,12);
 
+    verticalID = 2;
 
     int lineCount = 0;
 
@@ -250,7 +252,7 @@ bool DigScene::init(){
         lineCount++;
         Line* newLine = Line::create();
         this->addChild(newLine);
-        if(lineCount == 3){
+        if(lineCount == 4){
             vertical.back()->getRectByID(verticalID)->clear();
         }
         newLine->initWithLastLine(vertical.back());
@@ -264,8 +266,6 @@ bool DigScene::init(){
     grap = Grap::create();
     currentLine = vertical.begin();
     advance(currentLine,3);
-    verticalID = 2;
-
 
     RectMap* target = (*currentLine)->getRectByID(verticalID);
 
@@ -281,10 +281,9 @@ bool DigScene::init(){
     (*currentLine)->getRectByID(verticalID)->clear();
 
     auto pauseSprite = Sprite::create("settings.png");
-
-    pauseSprite->setPosition(0,0);
-
+    pauseSprite->setPosition(VISIZE.width - pauseSprite->getBoundingBox().size.width/2,VISIZE.height-pauseSprite->getBoundingBox().size.height/2);
     pauseSprite->setScale(VISIZE.width/pauseSprite->getContentSize().width/6);
+
 
     isPause = false;
 
@@ -307,10 +306,7 @@ bool DigScene::init(){
 
     pauseMenu = Menu::create(pauseMenuItem, nullptr);
 
-
-    ///pauseMenu->setPosition(VISIZE.width*0.8,VISIZE.height*0.9);
-
-    pauseMenu->setPosition(VISIZE.width - pauseSprite->getBoundingBox().size.width,VISIZE.height-pauseSprite->getBoundingBox().size.height);
+    pauseMenu->setPosition(Point::ZERO);
 
 
     this->addChild(pauseMenu,11);

@@ -16,6 +16,7 @@ USING_NS_CC;
 class HomeScene: public Scene {
 public:
     bool init()override;
+    void onEnter()override;
     CREATE_FUNC(HomeScene);
     void replaceScene(Ref* pRect);
 

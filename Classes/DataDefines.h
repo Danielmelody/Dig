@@ -5,6 +5,7 @@
 
 USING_NS_CC;
 #define ACTION_INTERVAL 0.1
+#define VOLUME_ACTION 0.01
 #define PAUSE_TIME 0.5
 #define RECT_NUM_WIDTH 6
 #define VISIZE (Director::getInstance()->getVisibleSize())
@@ -25,7 +26,7 @@ USING_NS_CC;
 
 #define GRAP_Z_ORDER 5
 
-
+#define MAX_RANK_LIST 20
 
 
 #endif //MYGAME_DATADEFINES_H

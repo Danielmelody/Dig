@@ -10,6 +10,7 @@
 #include "StopScene.h"
 #include "Audio.h"
 #include "HomeScene.h"
+#include "RuduceVolume.h"
 
 using namespace std;
 USING_NS_CC;
@@ -45,7 +46,6 @@ public:
     void fail();
 
     void Myresume();
-
 
     std::function<void(int direction)> extraDig;
 
