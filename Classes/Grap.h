@@ -6,6 +6,7 @@
 
 #include "cocos2d.h"
 USING_NS_CC;
+using namespace std;
 
 #include "Audio.h"
 #include "DataDefines.h"
@@ -16,11 +17,15 @@ public:
     virtual bool init();
     //move and dig
     void Dig(int Direction);
+    inline void setDigType(int type){digType = type;}
+    vector<vector<int>> getBrickEffect(int startLine,int startID);
     inline Sprite* getSprite(){ return _sprite;}
     CREATE_FUNC(Grap);
 private:
     Point lastTargetPos;
     Sprite* _sprite;
+    int direction;
+    int digType;
 };
 
 

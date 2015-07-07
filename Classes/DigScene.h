@@ -33,6 +33,10 @@ public:
 
     void turnHorizen(int direction);
 
+    void effect(int direction);
+
+    bool clearBricks(int line,int id);
+
     void Shake(Ref* pSender);
 
     void addEnergy(Ref* pSender);

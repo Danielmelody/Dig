@@ -11,6 +11,7 @@ bool Grap::init() {
     if (!Node::init()) {
         return false;
     }
+    digType = BRICK;
     _sprite = Sprite::create("machine_basic.png");
     this->addChild(_sprite);
     _sprite->setScale(VISIZE.width/RECT_NUM_WIDTH/_sprite->getContentSize().width);
@@ -28,4 +29,26 @@ void Grap::Dig(int Direction) {
     //lastTargetPos += Point(Direction*VISIZE.width/RECT_NUM_WIDTH,0);
     log("horizen");
     log("xxx");
+}
+
+
+
+vector<vector<int>> Grap::getBrickEffect(int startLine, int startID) {
+    vector<vector<int>> points;
+    switch (digType)
+    {
+        case BRICK:
+            points = {{startLine,startID}};
+            break;
+        case FIRE:
+            points = {{startLine-1,startID-1},{startLine-1,startID},{startLine-1,startID+1},
+                    {startLine,startID-1},{startLine,startID},{startLine,startID+1},
+                      {startLine+1,startID-1},{startLine+1,startID},{startLine+1,startID+1}
+            };
+            break;
+        default:break;
+
+    }
+    digType = BRICK;
+    return points;
 }

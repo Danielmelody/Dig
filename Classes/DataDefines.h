@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 
 USING_NS_CC;
+#define GRAP_START_LINE 3
 #define ACTION_INTERVAL 0.1
 #define VOLUME_ACTION 0.01
 #define PAUSE_TIME 0.5
@@ -22,6 +23,10 @@ USING_NS_CC;
 #define STONE_ENERGY -10
 #define DIAMOND_ENERGY 15
 #define FIRE_ENERGY BRICK_ENERGY
+
+#define DIG_NORMAL 0
+#define DIG_FIRE 1
+#define DIG_SHOOT 2
 
 
 #define GRAP_Z_ORDER 5

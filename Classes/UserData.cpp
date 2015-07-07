@@ -6,10 +6,15 @@
 
 UserData* UserData::getInstance(){
     static UserData userData;
-    return userData;
+    return &userData;
 }
 
 void UserData::saveData(int score){
     string writeblePath = FileUtils::getInstance()->getWritablePath();
 
+}
+
+vector<int> UserData::getData() {
+    vector<int> ranks;
+    return ranks;
 }

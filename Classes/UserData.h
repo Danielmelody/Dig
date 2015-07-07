@@ -17,7 +17,7 @@ public:
     static UserData* getInstance();
     void saveData(int score);
     vector<int> getData();
-    ~UserData();
+    ~UserData(){};
 private:
     UserData(){};
 };

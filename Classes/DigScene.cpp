@@ -142,17 +142,32 @@ void DigScene::turnDown() {
     for (auto line: vertical) {
         line->up();
     }
-
-
-    grap->Dig(0);
+    effect(0);
 }
 
 void DigScene::turnHorizen(int direction) {
     if(Crash(currentLine,verticalID + direction)){
         return;
     }
-    grap->Dig(direction);
     verticalID += direction;
+    effect(direction);
+}
+
+void DigScene::effect(int direction) {
+    int nextLine = GRAP_START_LINE;
+    if(direction == 0){
+        nextLine++;
+    }
+
+    grap->Dig(direction);
+
+    grap->setDigType((*currentLine)->getRectByID(verticalID)->getType());
+
+    for(auto point: grap->getBrickEffect(nextLine,verticalID)){
+        clearBricks(point[0],point[1]);
+    }
+
+
 }
 
 void DigScene::Shake(Ref *pSender) {
@@ -281,7 +296,7 @@ bool DigScene::init(){
     (*currentLine)->getRectByID(verticalID)->clear();
 
     auto pauseSprite = Sprite::create("settings.png");
-    pauseSprite->setPosition(VISIZE.width - pauseSprite->getBoundingBox().size.width/2,VISIZE.height-pauseSprite->getBoundingBox().size.height/2);
+    pauseSprite->setPosition(VISIZE.width - VISIZE.width/6,VISIZE.height-VISIZE.width/6);
     pauseSprite->setScale(VISIZE.width/pauseSprite->getContentSize().width/6);
 
 
@@ -441,3 +456,16 @@ void DigScene::addEnergy(Ref *pSender) {
         case FIRE:progressTimer->setPercentage(progressTimer->getPercentage()+FIRE_ENERGY);break;
     }
 }
+
+bool DigScene::clearBricks(int line, int id){
+    if(line >= vertical.size() || id < 0 || id >= RECT_NUM_WIDTH){
+        return false;
+    }
+    list<Line*>::iterator targetLine = vertical.begin();
+    advance(targetLine,line);
+    if((*targetLine)->getRectByID(id)->getType() == BRICK) {
+        (*targetLine)->getRectByID(id)->beDigged();
+    }
+}
+
+
