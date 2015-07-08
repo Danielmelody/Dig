@@ -15,6 +15,9 @@ public:
     virtual bool init();
     //Different Rect reflect differently when being digged
     virtual void beDigged();
+
+    virtual void beDiggedInstantly();
+
     //make RectMap empty
     virtual  void clear();
     inline Sprite* getSprite(){ return _sprite;}
@@ -32,6 +35,7 @@ class Brick:public RectMap{
 public:
     bool init()override;
     void beDigged()override;
+    void beDiggedInstantly()override;
     CREATE_FUNC(Brick);
 };
 
@@ -39,6 +43,7 @@ class Stone:public RectMap{
 public:
     bool init()override;
     void beDigged()override;
+    void beDiggedInstantly()override;
     CREATE_FUNC(Stone);
 };
 

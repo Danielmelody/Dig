@@ -18,11 +18,11 @@ public:
     bool init()override;
     void onEnter()override;
     CREATE_FUNC(HomeScene);
-    void replaceScene(Ref* pRect);
-
+    void replaceScene(Ref *pRect);
 
 private:
     bool isOut;
+    Sprite *c1,*c2,*c3,*dig_logo;
 };
 
 

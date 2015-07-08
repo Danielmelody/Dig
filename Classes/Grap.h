@@ -18,7 +18,7 @@ public:
     //move and dig
     void Dig(int Direction);
     inline void setDigType(int type){digType = type;}
-    vector<vector<int>> getBrickEffect(int startLine,int startID);
+    vector<vector<int>> getBrickEffect(int startLine,int startID,int type);
     inline Sprite* getSprite(){ return _sprite;}
     CREATE_FUNC(Grap);
 private:

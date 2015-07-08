@@ -18,9 +18,9 @@ USING_NS_CC;
 #define FIRE 4
 #define LIGHT 5
 #define HP_UNIT_UPDATE 0.2
-#define HP_UPDATE_ADD 0.02
+#define HP_UPDATE_ADD 0.0001
 #define BRICK_ENERGY 0.8
-#define STONE_ENERGY -10
+#define STONE_ENERGY -30
 #define DIAMOND_ENERGY 15
 #define FIRE_ENERGY BRICK_ENERGY
 

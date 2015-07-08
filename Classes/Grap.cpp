@@ -33,9 +33,9 @@ void Grap::Dig(int Direction) {
 
 
 
-vector<vector<int>> Grap::getBrickEffect(int startLine, int startID) {
+vector<vector<int>> Grap::getBrickEffect(int startLine, int startID,int type) {
     vector<vector<int>> points;
-    switch (digType)
+    switch (type)
     {
         case BRICK:
             points = {{startLine,startID}};
@@ -46,9 +46,11 @@ vector<vector<int>> Grap::getBrickEffect(int startLine, int startID) {
                       {startLine+1,startID-1},{startLine+1,startID},{startLine+1,startID+1}
             };
             break;
-        default:break;
+        default:
+            points = {{startLine,startID}};
+            break;
 
     }
-    digType = BRICK;
+    //digType = BRICK;
     return points;
 }

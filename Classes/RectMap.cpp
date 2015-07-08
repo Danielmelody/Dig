@@ -13,10 +13,15 @@ bool RectMap::init() {
     return true;
 }
 
+void RectMap::beDiggedInstantly() {
+    __NotificationCenter::getInstance()->postNotification("changeEnergy",this);
+    log("changeEnergy: type = %d ",this->getType());
+    beDigged();
+}
+
 void RectMap::beDigged(){
     if(!empty){
         hp--;
-        NotificationCenter::getInstance()->postNotification("changeEnergy",this);
     }
 }
 
@@ -42,7 +47,15 @@ bool Brick::init() {
     return true;
 }
 
+void Brick::beDiggedInstantly() {
+    int beforeType = this->getType();
+    RectMap::beDiggedInstantly();
+    beDigged();
+    type = beforeType;
+}
+
 void Brick::beDigged() {
+    __NotificationCenter::getInstance()->postNotification("changeEnergy",this);
     RectMap::beDigged();
     if(hp == 0&&!empty){
         _sprite->setVisible(false);
@@ -61,9 +74,10 @@ void Brick::beDigged() {
         explo->setPosition(_sprite->getPosition());
         empty = true;
     }
+    type = BRICK;
 }
 
-bool Stone::init() {
+bool Stone::init(){
     if(!RectMap::init()){
         return false;
     }
@@ -72,12 +86,15 @@ bool Stone::init() {
     _sprite = Sprite::create("Stone.png");
     _sprite->setScale(VISIZE.width/RECT_NUM_WIDTH/_sprite->getContentSize().width);
     this->addChild(_sprite);
-
     return true;
 }
 
-void Stone::beDigged() {
+void Stone::beDiggedInstantly() {
+    RectMap::beDiggedInstantly();
     SimpleAudioEngine::getInstance()->playEffect(CRASH_AUDIO);
+}
+
+void Stone::beDigged() {
     RectMap::beDigged();
 }
 
@@ -95,20 +112,58 @@ void Ore::clear() {
 }
 
 void Ore::beDigged() {
-    Brick::beDigged();
-    this->removeChild(_extra);
-
     switch (type){
         case DIAMOND:
             SimpleAudioEngine::getInstance()->playEffect(MINE1_AUDIO);
             break;
         case FIRE:
+            BlendFunc dark = { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA };
+
+
+            auto fire = ParticleExplosion::create();
+
+            fire->setStartColor(Color4F(1, 1, 0, 1));
+            fire->setStartColorVar(Color4F(0, 0, 0, 0));
+            fire->setEndColor(Color4F(1, 0, 0, 0.5));
+            fire->setEndColorVar(Color4F(0, 0, 0, 0));
+            fire->setEndSize(Director::getInstance()->getVisibleSize().height);
+            fire->setBlendAdditive(true);
+            fire->setLife(0.3);
+            fire->setLifeVar( 0.3);
+            fire->setSpeed(Director::getInstance()->getVisibleSize().width / 100);
+            fire->setSpeedVar(Director::getInstance()->getVisibleSize().width / 100);
+            fire->setEmissionRate(60);
+            fire->setPosition(_sprite->getPosition());
+
+            auto fireDark = ParticleExplosion::create();
+            fireDark->setStartColor(Color4F(1, 0.3, 0, 0));
+            fireDark->setStartColorVar(Color4F(0, 0, 0, 0));
+            fireDark->setEndColor(Color4F(0, 0, 0,1));
+            fireDark->setEndColorVar(Color4F(0, 0, 0, 0));
+            fireDark->setEndSize(Director::getInstance()->getVisibleSize().height / 10);
+            fireDark->setBlendAdditive(true);
+            fireDark->setLife(0.3);
+            fireDark->setLifeVar(0.3);
+            fireDark->setSpeed(Director::getInstance()->getVisibleSize().width / 20);
+            fireDark->setEmissionRate(1500);
+            fireDark->setBlendFunc(dark);
+            fireDark->setPosition(_sprite->getPosition());
+
+            //this->addChild(fireDark);
+            fireDark->setGlobalZOrder(50);
+            this->addChild(fire);
+            fire->setGlobalZOrder(51);
+
+            fire->setPositionType(ParticleSystem::PositionType::GROUPED);
+            fireDark->setPositionType(ParticleSystem::PositionType::GROUPED);
+
             SimpleAudioEngine::getInstance()->playEffect(MINE1_AUDIO);
             NotificationCenter::getInstance()->postNotification("equip",this);
             break;
     }
+    Brick::beDigged();
+    this->removeChild(_extra);
 
-    log("OreDig");
 }
 
 void Ore::setOreType(int type) {

@@ -1,5 +1,6 @@
 #include "DigScene.h"
 
+
 USING_NS_CC;
 
 Scene* DigScene::createScene()
@@ -105,14 +106,51 @@ void DigScene::setTouchLayer(Layer *layer) {
 
 }
 
+void DigScene::setPauseMenu(Sprite* sprite) {
+    auto pauseListener = EventListenerTouchOneByOne::create();
+
+    pauseListener->onTouchBegan = [=](Touch* touch,Event* event){
+
+        if(sprite->getBoundingBox().containsPoint(sprite->convertToNodeSpace(touch->getLocation()))){
+            pauseFlag = true;
+            return true;
+        }
+        return false;
+    };
+
+    pauseListener->onTouchMoved = [=](Touch* touch,Event* event){
+        if(!sprite->getBoundingBox().containsPoint(sprite->convertToNodeSpace(touch->getLocation()))){
+            pauseFlag = false;
+        }
+
+    };
+
+    pauseListener->onTouchEnded = [=](Touch* touch,Event* event){
+        if(pauseFlag){
+            pause();
+        }
+    };
+
+    pauseListener->onTouchCancelled = [=](Touch* touch,Event* event){
+
+    };
+
+
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(pauseListener,sprite);
+
+
+}
+
+
+
 bool DigScene::Crash(list<Line*>::iterator nextLine,int nextverID) {
     if (nextverID >= 0 && nextverID < RECT_NUM_WIDTH) {
-        (*nextLine)->getRectByID(nextverID)->beDigged();
         if ((*nextLine)->getRectByID(nextverID)->getType() != STONE) {
             log("true");
             return false;
         }
         NotificationCenter::getInstance()->postNotification("shake");
+        (*nextLine)->getRectByID(nextverID)->beDiggedInstantly();
     }
     return true;
 }
@@ -129,7 +167,6 @@ void DigScene::turnDown() {
     }
 
     score++;
-    hpSpeed += HP_UPDATE_ADD;
     char str[100] = {'0'};
     sprintf(str, "%d", score);
     scoreLabel->setString(str);
@@ -156,30 +193,56 @@ void DigScene::turnHorizen(int direction) {
 void DigScene::effect(int direction) {
     int nextLine = GRAP_START_LINE;
     if(direction == 0){
-        nextLine++;
+        //nextLine++;
     }
 
     grap->Dig(direction);
 
-    grap->setDigType((*currentLine)->getRectByID(verticalID)->getType());
+    (*currentLine)->getRectByID(verticalID)->beDiggedInstantly();
 
-    for(auto point: grap->getBrickEffect(nextLine,verticalID)){
-        clearBricks(point[0],point[1]);
+    exploInSeq(nextLine,verticalID);
+
+}
+
+void DigScene::exploInSeq(int line, int ID) {
+    log("%d,%d",line,ID);
+    if(line >= vertical.size() || line <0 ){
+        return;
     }
-
+    if(ID < 0 || ID >= RECT_NUM_WIDTH){
+        return;
+    }
+    auto lineIt = vertical.begin();
+    advance(lineIt,line);
+    if((*lineIt)->getRectByID(ID)->getType() == FIRE) {
+        for (auto point: grap->getBrickEffect(line, ID,FIRE)) {
+            if(line != point[0] || ID != point[1]) {
+                exploInSeq(point[0], point[1]);
+            }
+            clearBricks(point[0], point[1]);
+            //log("explo: %d,%d",point[0],point[1]);
+        }
+    }
+    else {
+        clearBricks(line,ID);
+    }
 
 }
 
 void DigScene::Shake(Ref *pSender) {
     log("shake");
-    this->runAction(CCShake::create(0.5,VISIZE.width/30));
+    this->runAction(Sequence::create(CCShake::create(0.5,VISIZE.width/30),CallFunc::create([=](){
+        this->setRotation(0);
+    }), nullptr));
 }
 
 
 void DigScene::updateHp(float dt) {
+    hp = MIN(hp,100);
     hp -= hpSpeed;
+    hpSpeed += HP_UPDATE_ADD;
     float nowhp = progressTimer->getPercentage();
-    progressTimer->setPercentage(nowhp-HP_UNIT_UPDATE);
+    progressTimer->setPercentage(hp);
     if(nowhp>75){
         timer->setTexture(Director::getInstance()->getTextureCache()->addImage("energy_front_g.png"));
     }
@@ -195,6 +258,7 @@ void DigScene::updateHp(float dt) {
 
     if(nowhp==0)fail();
 }
+
 
 void DigScene::onEnter(){
     Layer::onEnter();
@@ -295,41 +359,16 @@ bool DigScene::init(){
 
     (*currentLine)->getRectByID(verticalID)->clear();
 
-    auto pauseSprite = Sprite::create("settings.png");
+    pauseSprite = Sprite::create("settings.png");
     pauseSprite->setPosition(VISIZE.width - VISIZE.width/6,VISIZE.height-VISIZE.width/6);
     pauseSprite->setScale(VISIZE.width/pauseSprite->getContentSize().width/6);
-
-
-    isPause = false;
-
-
-    MenuItemSprite* pauseMenuItem = MenuItemSprite::create(pauseSprite, nullptr, [=](Ref* sender)
-    {
-        SimpleAudioEngine::getInstance()->playEffect(BUTTON);
-        if(!isPause) {
-            pauseSprite->setTexture(Director::getInstance()->getTextureCache()->addImage("settings-play.png"));
-            pause();
-            isPause = true;
-        }
-        else{
-            pauseSprite->setTexture(Director::getInstance()->getTextureCache()->addImage("settings.png"));
-            Myresume();
-            isPause = false;
-        }
-    }
-    );
-
-    pauseMenu = Menu::create(pauseMenuItem, nullptr);
-
-    pauseMenu->setPosition(Point::ZERO);
-
-
-    this->addChild(pauseMenu,11);
-
-    log("x:%f,y:%f",pauseMenu->getPosition().x,pauseMenu->getPosition().y);
+    this->addChild(pauseSprite,10);
 
     /*set touch enabled*/
     setTouchLayer(this);
+
+    /*set Menu Enabled*/
+    setPauseMenu(pauseSprite);
 
     /*Shake call-func when run into Stone*/
     NotificationCenter::getInstance()->addObserver(this,callfuncO_selector(DigScene::Shake),"shake", nullptr);
@@ -345,21 +384,21 @@ bool DigScene::init(){
 
 void DigScene::fail() {
 
+
     SimpleAudioEngine::getInstance()->playEffect(FAIL_AUDIO);
 
     pause();
     SimpleAudioEngine::getInstance()->stopBackgroundMusic();
-    pauseMenu->setVisible(false);
-    pauseMenu->setEnabled(false);
+    log("bg is ok");
+    pauseSprite->setVisible(false);
+    //pauseSprite->setEnabled(false);
 
-    log("fail");
 }
 
 void DigScene::pause(){
+
     stop = Layer::create();
-
     stop->setPosition(Point(VISIZE.width,0));
-
     stop->runAction(EaseBackOut::create(MoveTo::create(PAUSE_TIME,Point(0,0))));
 
     this->addChild(stop,11);
@@ -376,6 +415,8 @@ void DigScene::pause(){
     timeOut->setScale(VISIZE.width / timeOut->getContentSize().width/1.414);
     stop->addChild(timeOut,1);
     this->unschedule(schedule_selector(DigScene::updateHp));
+
+
 
     auto restart = MenuItemImage::create("menu_restart.png", "menu_restart.png", [=](Ref* sender)
     {
@@ -433,6 +474,8 @@ void DigScene::pause(){
 
     SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
 
+    log("end of pause");
+
 }
 
 void DigScene::Myresume() {
@@ -448,12 +491,15 @@ void DigScene::Myresume() {
 }
 
 void DigScene::addEnergy(Ref *pSender) {
+
     RectMap* rect = (RectMap*)pSender;
+    log("real change: type = %d",rect->getType());
+
     switch(rect->getType()){
-        case BRICK:progressTimer->setPercentage(progressTimer->getPercentage()+BRICK_ENERGY);break;
-        case STONE:progressTimer->setPercentage(progressTimer->getPercentage()+STONE_ENERGY);break;
-        case DIAMOND:progressTimer->setPercentage(progressTimer->getPercentage()+DIAMOND_ENERGY);break;
-        case FIRE:progressTimer->setPercentage(progressTimer->getPercentage()+FIRE_ENERGY);break;
+        case BRICK:hp += BRICK_ENERGY;break;
+        case STONE:hp += STONE_ENERGY;break;
+        case DIAMOND:hp += DIAMOND_ENERGY;break;
+        case FIRE:hp += FIRE_ENERGY;break;
     }
 }
 
@@ -463,9 +509,8 @@ bool DigScene::clearBricks(int line, int id){
     }
     list<Line*>::iterator targetLine = vertical.begin();
     advance(targetLine,line);
-    if((*targetLine)->getRectByID(id)->getType() == BRICK) {
-        (*targetLine)->getRectByID(id)->beDigged();
-    }
+    (*targetLine)->getRectByID(id)->beDigged();
 }
+
 
 

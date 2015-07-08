@@ -29,6 +29,8 @@ public:
 
     void setTouchLayer(Layer* layer);
 
+    void setPauseMenu(Sprite* sprite);
+
     void turnDown();
 
     void turnHorizen(int direction);
@@ -53,11 +55,16 @@ public:
 
     std::function<void(int direction)> extraDig;
 
+    void exploInSeq(int line,int ID);
+
+
     // implement the "static create()" method manually
     CREATE_FUNC(DigScene);
 private:
     bool isPause;
     bool isFirstTouch;
+    bool pauseFlag;
+    Sprite* pauseSprite;
     Grap* grap;
     list<Line*> vertical;
     list<Line*>::iterator currentLine;
