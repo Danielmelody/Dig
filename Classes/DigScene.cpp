@@ -241,6 +241,7 @@ void DigScene::updateHp(float dt) {
     hp = MIN(hp,100);
     hp -= hpSpeed;
     hpSpeed += HP_UPDATE_ADD;
+    hpSpeed = MIN(hpSpeed,3);
     float nowhp = progressTimer->getPercentage();
     progressTimer->setPercentage(hp);
     if(nowhp>75){
