@@ -91,7 +91,7 @@ bool Stone::init(){
 
 void Stone::beDiggedInstantly() {
     RectMap::beDiggedInstantly();
-    SimpleAudioEngine::getInstance()->playEffect(CRASH_AUDIO);
+    SimpleAudioEngine::getInstance()->playEffect(Audio::CRASH_AUDIO.c_str());
 }
 
 void Stone::beDigged() {
@@ -114,7 +114,7 @@ void Ore::clear() {
 void Ore::beDigged() {
     switch (type){
         case DIAMOND:
-            SimpleAudioEngine::getInstance()->playEffect(MINE1_AUDIO);
+            SimpleAudioEngine::getInstance()->playEffect(Audio::MINE1_AUDIO.c_str());
             break;
         case FIRE:
             BlendFunc dark = { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA };
@@ -157,7 +157,7 @@ void Ore::beDigged() {
             fire->setPositionType(ParticleSystem::PositionType::GROUPED);
             fireDark->setPositionType(ParticleSystem::PositionType::GROUPED);
 
-            SimpleAudioEngine::getInstance()->playEffect(MINE1_AUDIO);
+            SimpleAudioEngine::getInstance()->playEffect(Audio::MINE1_AUDIO.c_str());
             NotificationCenter::getInstance()->postNotification("equip",this);
             break;
     }

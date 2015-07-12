@@ -76,7 +76,7 @@ void DigScene::setTouchLayer(Layer *layer) {
             log("end");
 
             if(isFirstTouch){
-                SimpleAudioEngine::getInstance()->playBackgroundMusic(BG_MUSIC,true);
+                SimpleAudioEngine::getInstance()->playBackgroundMusic(Audio::BG_MUSIC.c_str(),true);
                 isFirstTouch = false;
             }
 
@@ -264,7 +264,7 @@ void DigScene::updateHp(float dt) {
 void DigScene::onEnter(){
     Layer::onEnter();
     SimpleAudioEngine::getInstance()->stopBackgroundMusic();
-    SimpleAudioEngine::getInstance()->preloadBackgroundMusic(BG_MUSIC);
+    SimpleAudioEngine::getInstance()->preloadBackgroundMusic(Audio::BG_MUSIC.c_str());
     isFirstTouch = true;
 }
 
@@ -386,7 +386,7 @@ bool DigScene::init(){
 void DigScene::fail() {
 
 
-    SimpleAudioEngine::getInstance()->playEffect(FAIL_AUDIO);
+    SimpleAudioEngine::getInstance()->playEffect(Audio::FAIL_AUDIO.c_str());
 
     pause();
     SimpleAudioEngine::getInstance()->stopBackgroundMusic();
@@ -423,7 +423,7 @@ void DigScene::pause(){
     {
         log("restart");
 
-        SimpleAudioEngine::getInstance()->playEffect(RESTART_AUDIO);
+        SimpleAudioEngine::getInstance()->playEffect(Audio::RESTART_AUDIO.c_str());
 
         auto re = [=](){
 

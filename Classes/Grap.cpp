@@ -25,7 +25,7 @@ void Grap::Dig(int Direction) {
      */
     //_sprite->setPosition(lastTargetPos);
     _sprite->runAction(MoveBy::create(ACTION_INTERVAL,Point(Direction*VISIZE.width/RECT_NUM_WIDTH,0)));
-    SimpleAudioEngine::getInstance()->playEffect(DIG_AUDIO);
+    SimpleAudioEngine::getInstance()->playEffect(Audio::DIG_AUDIO.c_str());
     //lastTargetPos += Point(Direction*VISIZE.width/RECT_NUM_WIDTH,0);
     log("horizen");
     log("xxx");

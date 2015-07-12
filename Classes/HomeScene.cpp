@@ -7,7 +7,7 @@
 
 void HomeScene::onEnter(){
     Node::onEnter();
-    SimpleAudioEngine::getInstance()->playBackgroundMusic(S_BG_MUSIC, true);
+    SimpleAudioEngine::getInstance()->playBackgroundMusic(Audio::S_BG_MUSIC.c_str(), true);
     MoveBy* c2Move = MoveBy::create(2,Point(VISIZE.width/10,0));
     log("action");
     c2->runAction(RepeatForever::create(Sequence::create(c2Move,c2Move->reverse(), nullptr)));
@@ -21,12 +21,12 @@ bool HomeScene::init(){
         return false;
     }
 
-    SimpleAudioEngine::getInstance()->preloadEffect(RESTART_AUDIO);
-    SimpleAudioEngine::getInstance()->preloadEffect(DIG_AUDIO);
-    SimpleAudioEngine::getInstance()->preloadEffect(MINE1_AUDIO);
-    SimpleAudioEngine::getInstance()->preloadEffect(BUTTON);
-    SimpleAudioEngine::getInstance()->preloadEffect(FAIL_AUDIO);
-    SimpleAudioEngine::getInstance()->preloadEffect(CRASH_AUDIO);
+    SimpleAudioEngine::getInstance()->preloadEffect(Audio::RESTART_AUDIO.c_str());
+    SimpleAudioEngine::getInstance()->preloadEffect(Audio::DIG_AUDIO.c_str());
+    SimpleAudioEngine::getInstance()->preloadEffect(Audio::MINE1_AUDIO.c_str());
+    SimpleAudioEngine::getInstance()->preloadEffect(Audio::BUTTON.c_str());
+    SimpleAudioEngine::getInstance()->preloadEffect(Audio::FAIL_AUDIO.c_str());
+    SimpleAudioEngine::getInstance()->preloadEffect(Audio::CRASH_AUDIO.c_str());
 
 
     Sprite *BG = Sprite::create("background.jpg");
@@ -40,7 +40,7 @@ bool HomeScene::init(){
     c2->setScale(VISIZE.width / c2->getContentSize().width);
     this->addChild(c2,2);
 
-    Sprite *star = Sprite::create("star.png");
+    Sprite *star = Sprite::create("Brick.jpg");
     star->setPosition(VISIZE.width / 2, VISIZE.height / 2);
     star->setScaleX(VISIZE.width / star->getContentSize().width);
     star->setScaleY(VISIZE.height / star->getContentSize().height);
